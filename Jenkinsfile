@@ -2,7 +2,7 @@ pipeline {
     agent any
     tools {
         terraform 'terraform'
-}
+    }
 
 
     environment {
@@ -72,7 +72,7 @@ pipeline {
 
         stage('Destroy the infrastructure'){
             steps{
-                timeout(time:5, unit:'DAYS'){
+                timeout(time:5, unit:'DAYS') {
                     input message:'Approve terminate'
                 }
                 sh """
@@ -82,7 +82,6 @@ pipeline {
                 """
             }
         }
-
     }
 
     post {
@@ -90,6 +89,7 @@ pipeline {
             echo 'Deleting all local images'
             sh 'docker image prune -af'
         }
+
         failure {
             echo 'Delete the Image Repository on ECR due to the Failure'
             sh """
@@ -99,6 +99,4 @@ pipeline {
                 sh 'terraform destroy --auto-approve'
         }
     }
-
-
 }
