@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         PATH = sh(script:"echo $PATH:/usr/local/bin", returnStdout:true).trim()
-        APP_REPO_NAME = "phonebook"
+        APP_REPO_NAME = "phonebookcoy"
         ACR_REGISTRY = "phonebookcoy.azurecr.io"
         APP_NAME = "todo"
         MY_RESOURCE_GROUP = "phonebook-rg"
