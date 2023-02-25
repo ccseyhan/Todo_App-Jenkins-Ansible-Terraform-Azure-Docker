@@ -39,7 +39,7 @@ resource "azurerm_resource_group" "rg" {
 ######################
 resource "azurerm_virtual_network" "vnet" {
   name                = "${var.prefix}-vnet"
-  address_space       = ["10.0.0.0/16"]
+  address_space       = [ "10.0.0.0/16" ]
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 }
@@ -48,7 +48,7 @@ resource "azurerm_subnet" "subnet" {
   name                 = "${var.prefix}-subnet"
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = ["10.0.1.0/24"]
+  address_prefixes     = [ "10.0.1.0/24" ]
 }
 
 ########################
@@ -56,20 +56,21 @@ resource "azurerm_subnet" "subnet" {
 ########################
 resource "azurerm_virtual_machine" "vm" {
   count                            = 3
-  name                             = "${var.prefix}-${count.index}"
+  name                             = var.vm_tags[count.index]
   location                         = azurerm_resource_group.rg.location
   resource_group_name              = azurerm_resource_group.rg.name
-  network_interface_ids            = [azurerm_network_interface.nic[count.index].id]
+  network_interface_ids            = [ azurerm_network_interface.nic[count.index].id ]
   vm_size                          = "Standard_D2s_v3"
   delete_os_disk_on_termination    = true
   delete_data_disks_on_termination = true
   tags = {
     "name" = var.vm_tags[count.index]
+    "environment" = "development"
   }
 
   identity {
     type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.identity.id]
+    identity_ids = [ azurerm_user_assigned_identity.identity.id ]
   }
 
   storage_image_reference {
