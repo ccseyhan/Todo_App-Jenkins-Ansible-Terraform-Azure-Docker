@@ -80,19 +80,19 @@ resource "azurerm_virtual_machine" "vm" {
   #   version   = "latest"
   # }
 
-  #   storage_image_reference {
-  #   publisher = "RedHat"
-  #   offer     = "RHEL"
-  #   sku       = "8.4"
-  #   version   = "latest"
-  # }
-
-  storage_image_reference {
-    publisher = "OpenLogic"
-    offer     = "CentOS"
-    sku       = "7.8"
+    storage_image_reference {
+    publisher = "RedHat"
+    offer     = "RHEL"
+    sku       = "8.4"
     version   = "latest"
   }
+
+  # storage_image_reference {
+  #   publisher = "OpenLogic"
+  #   offer     = "CentOS"
+  #   sku       = "7.8"
+  #   version   = "latest"
+  # }
 
   storage_os_disk {
     name              = "${var.prefix}-osdisk-${count.index}"
