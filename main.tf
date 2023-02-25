@@ -64,7 +64,7 @@ resource "azurerm_virtual_machine" "vm" {
   delete_os_disk_on_termination    = true
   delete_data_disks_on_termination = true
   tags = {
-    "name" = var.vm_tags[count.index]
+    "name" = "${element(var.vm_tags, count.index )}"
     "environment" = "development"
   }
 
