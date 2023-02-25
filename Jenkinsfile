@@ -54,7 +54,7 @@ pipeline {
             steps {
                 echo 'Pushing App Image to ECR Repo'
                 sh 'sudo apt install jq'
-                sh 'az acr login --name ${ACR_REGISTRY} --expose-token | jq -r '.accessToken' | docker login --username 00000000-0000-0000-0000-000000000000 --password-stdin "$ACR_REGISTRY"'
+                sh 'az acr login --name ${ACR_REGISTRY} --expose-token | jq -r ".accessToken" | docker login --username 00000000-0000-0000-0000-000000000000 --password-stdin "$ACR_REGISTRY"'
                 sh 'docker push "$ACR_REGISTRY/$APP_REPO_NAME:postgr"'
                 sh 'docker push "$ACR_REGISTRY/$APP_REPO_NAME:nodejs"'
                 sh 'docker push "$ACR_REGISTRY/$APP_REPO_NAME:react"'
