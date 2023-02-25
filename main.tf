@@ -80,6 +80,13 @@ resource "azurerm_virtual_machine" "vm" {
   #   version   = "latest"
   # }
 
+  #   storage_image_reference {
+  #   publisher = "RedHat"
+  #   offer     = "RHEL"
+  #   sku       = "8.4"
+  #   version   = "latest"
+  # }
+
   storage_image_reference {
     publisher = "OpenLogic"
     offer     = "CentOS"
