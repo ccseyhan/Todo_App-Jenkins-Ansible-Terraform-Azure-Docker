@@ -1,5 +1,5 @@
 - name: install docker and config
-  hosts: _development_1
+  hosts: _development
   become: true
   vars:
     aws_region: us-east-1
@@ -37,7 +37,7 @@
     - name: Add Docker repo
       get_url:
         url: https://download.docker.com/linux/centos/docker-ce.repo
-        dest: /etc/yum.repos.d/docer-ce.repo
+        dest: /etc/yum.repos.d/docker-ce.repo
 
     - name: Install Docker
       package:
@@ -64,7 +64,7 @@
       service:
         name: docker
         state: started
-        enabled: yes 
+        enabled: yes
 
     - name: install aws cli
       get_url:
@@ -84,10 +84,10 @@
       shell: |
         export PATH=/usr/local/bin:$PATH
         source ~/.bash_profile
-        aws ecr get-login-password --region {{ aws_region }} | docker login --username AWS --password-stdin {{ ecr_registry }}  
-        
+        aws ecr get-login-password --region {{ aws_region }} | docker login --username AWS --password-stdin {{ ecr_registry }}
+
 - name: postgre database config   #PLAY2
-  hosts: _ansible_postgresql
+  hosts: _postgresql
   become: true
   vars:
     postgre_container: /home/ec2-user/postgresql
@@ -107,10 +107,10 @@
         env:
           POSTGRES_PASSWORD: "Pp123456789"
         volumes:
-          - /db-data:/var/lib/postgresql/data   
+          - /db-data:/var/lib/postgresql/data
 
 - name: Nodejs Server configuration   #PLAY3
-  hosts: _ansible_nodejs
+  hosts: _nodejs
   become: true
   vars:
     container_path: /home/ec2-user/nodejs
@@ -129,7 +129,7 @@
           - "5000:5000"
 
 - name: React UI Server configuration     #PLAY4
-  hosts: _ansible_react
+  hosts: _react
   become: true
   vars:
     container_path: /home/ec2-user/react
@@ -145,4 +145,4 @@
         image: "{{ image_name }}"
         state: started
         ports:
-          - "3000:3000"                    
+          - "3000:3000"
