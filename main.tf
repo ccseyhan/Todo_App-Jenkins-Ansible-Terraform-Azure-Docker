@@ -11,6 +11,7 @@ terraform {
     storage_account_name = "ycetindil"
     container_name       = "tfstate"
     key                  = "terraform.tfstate"
+    use_msi              = true
   }
 }
 
