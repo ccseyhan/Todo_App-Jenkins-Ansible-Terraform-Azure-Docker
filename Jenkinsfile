@@ -16,6 +16,7 @@ pipeline {
     stages {
         stage('Create Infrastructure for the App') {
             steps {
+                sh 'az login --identity'
                 echo 'Creating Infrastructure for the App on Azure Cloud'
                 sh 'terraform init'
                 sh 'terraform apply --auto-approve'
