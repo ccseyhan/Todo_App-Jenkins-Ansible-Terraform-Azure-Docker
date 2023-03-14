@@ -4,13 +4,11 @@ pipeline {
         terraform 'terraform'
     }
 
-
     environment {
         PATH = sh(script:"echo $PATH:/usr/local/bin", returnStdout:true).trim()
-        APP_REPO_NAME = "phonebookcoy"
-        ACR_REGISTRY = "phonebookcoy.azurecr.io"
-        APP_NAME = "todo"
-        MY_RESOURCE_GROUP = "phonebook-rg"
+        ACR_REGISTRY = "todoappcoy.azurecr.io"
+        ACR_REPO_NAME = "todoapp"
+        ACR_RESOURCE_GROUP = "todoapp-rg"
     }
 
     stages {
@@ -26,7 +24,7 @@ pipeline {
         stage('Create ACR Repo') {
             steps {
                 echo 'Creating ACR Repo for App'
-                sh 'az acr create --resource-group ${MY_RESOURCE_GROUP} --name ${APP_REPO_NAME} --sku Basic'
+                sh 'az acr create --resource-group ${ACR_RESOURCE_GROUP} --name ${ACR_REPO_NAME} --sku Basic'
             }
         }
 
@@ -43,9 +41,9 @@ pipeline {
                 sh 'cat ./nodejs/server/.env'
                 sh 'envsubst < react-env-template > ./react/client/.env'
                 sh 'cat ./react/client/.env'
-                sh 'docker build --force-rm -t "$ACR_REGISTRY/$APP_REPO_NAME:postgr" -f ./postgresql/dockerfile-postgresql .'
-                sh 'docker build --force-rm -t "$ACR_REGISTRY/$APP_REPO_NAME:nodejs" -f ./nodejs/dockerfile-nodejs .'
-                sh 'docker build --force-rm -t "$ACR_REGISTRY/$APP_REPO_NAME:react" -f ./react/dockerfile-react .'
+                sh 'docker build --force-rm -t "$ACR_REGISTRY/$ACR_REPO_NAME:postgr" -f ./postgresql/dockerfile-postgresql .'
+                sh 'docker build --force-rm -t "$ACR_REGISTRY/$ACR_REPO_NAME:nodejs" -f ./nodejs/dockerfile-nodejs .'
+                sh 'docker build --force-rm -t "$ACR_REGISTRY/$ACR_REPO_NAME:react" -f ./react/dockerfile-react .'
                 sh 'docker image ls'
             }
         }
@@ -53,10 +51,11 @@ pipeline {
         stage('Push Image to ECR Repo') {
             steps {
                 echo 'Pushing App Image to ECR Repo'
-                sh 'az acr login --name ${ACR_REGISTRY} --expose-token | jq -r ".accessToken" | docker login --username 00000000-0000-0000-0000-000000000000 --password-stdin "$ACR_REGISTRY"'
-                sh 'docker push "$ACR_REGISTRY/$APP_REPO_NAME:postgr"'
-                sh 'docker push "$ACR_REGISTRY/$APP_REPO_NAME:nodejs"'
-                sh 'docker push "$ACR_REGISTRY/$APP_REPO_NAME:react"'
+                sh 'TOKEN=$(az acr login --name ${ACR_REGISTRY} --expose-token --output tsv --query accessToken)'
+                sh 'docker login --username 00000000-0000-0000-0000-000000000000 --password $TOKEN'
+                sh 'docker push "$ACR_REGISTRY/$ACR_REPO_NAME:postgr"'
+                sh 'docker push "$ACR_REGISTRY/$ACR_REPO_NAME:nodejs"'
+                sh 'docker push "$ACR_REGISTRY/$ACR_REPO_NAME:react"'
             }
         }
 
@@ -78,25 +77,23 @@ pipeline {
                 sh """
                 docker image prune -af
                 terraform destroy --auto-approve
-                az acr delete --name ${APP_REPO_NAME} --yes
+                az acr delete --name ${ACR_REPO_NAME} --yes
                 """
             }
         }
     }
 
-    post {
-        always {
-            echo 'Deleting all local images'
-            sh 'docker image prune -af'
-        }
+    // post {
+    //     always {
+    //         echo 'Deleting all local images'
+    //         sh 'docker image prune -af'
+    //     }
 
-        failure {
-            echo 'Delete the Image Repository on ECR due to the Failure'
-            sh """
-                az acr delete --name ${APP_REPO_NAME} --yes
-            """
-            echo 'Deleting Terraform Stack due to the Failure'
-                sh 'terraform destroy --auto-approve'
-        }
-    }
+    //     failure {
+    //         echo 'Delete the Image Repository on ECR due to the Failure'
+    //         sh 'az acr delete --name ${ACR_REPO_NAME} --yes'
+    //         echo 'Deleting Terraform Stack due to the Failure'
+    //         sh 'terraform destroy --auto-approve'
+    //     }
+    // }
 }

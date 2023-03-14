@@ -21,7 +21,7 @@ provider "azurerm" {
   features {
   }
 
-  use_msi         = true
+  use_msi              = true
   subscription_id      = "453194c6-9b5a-46f8-bf6e-6b5a4133ee3a"
   tenant_id            = "1a93b615-8d62-418a-ac28-22501cf1f978"
 }
@@ -73,26 +73,12 @@ resource "azurerm_virtual_machine" "vm" {
     identity_ids = [ azurerm_user_assigned_identity.identity.id ]
   }
 
-  # storage_image_reference {
-  #   publisher = "Canonical"
-  #   offer     = "UbuntuServer"
-  #   sku       = "18.04-LTS"
-  #   version   = "latest"
-  # }
-
     storage_image_reference {
     publisher = "RedHat"
     offer     = "RHEL"
     sku       = "8"
     version   = "latest"
   }
-
-  # storage_image_reference {
-  #   publisher = "OpenLogic"
-  #   offer     = "CentOS"
-  #   sku       = "7.8"
-  #   version   = "latest"
-  # }
 
   storage_os_disk {
     name              = "${var.prefix}-osdisk-${count.index}"
@@ -164,57 +150,33 @@ resource "azurerm_role_assignment" "role_assignment" {
 #########################
 ### NSG & ASSOCIATION ###
 #########################
+locals {
+  inbound_ports_map = {
+    "100" : "22", # If the key starts with a number, you must use the colon syntax ":" instead of "="
+    "110" : "5000",
+    "120" : "3000",
+    "130" : "5432"
+  }
+}
 resource "azurerm_network_security_group" "nsg" {
   name                = "${var.prefix}-nsg"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
-  security_rule {
-    name                       = "AllowSSH"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "Allow5000"
-    priority                   = 110
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "5000"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "Allow3000"
-    priority                   = 120
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "3000"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "Allow5432"
-    priority                   = 130
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "5432"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
+  dynamic "security_rule" {
+    for_each = local.inbound_ports_map
+    iterator = item
+    content {
+      name                       = "Allow-${item.value}"
+      priority                   = item.key
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "Tcp"
+      source_port_range          = "*"
+      destination_port_range     = item.value
+      source_address_prefix      = "*"
+      destination_address_prefix = "*"
+    }
   }
 }
 

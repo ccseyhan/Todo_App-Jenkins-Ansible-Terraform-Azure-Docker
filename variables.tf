@@ -1,17 +1,5 @@
 variable "prefix" {
-  default = "phonebook"
-}
-
-variable "backend_rg_name" {
-  default = "ycetindil"
-}
-
-variable "backend_sa_name" {
-  default = "ycetindil"
-}
-
-variable "backend_container_name" {
-  default = "tfstate"
+  default = "todoapp"
 }
 
 variable "location" {
