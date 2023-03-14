@@ -52,7 +52,7 @@ pipeline {
             steps {
                 echo 'Pushing App Image to ECR Repo'
                 sh 'TOKEN=$(az acr login --name ${ACR_REGISTRY} --expose-token --output tsv --query accessToken)'
-                sh 'docker login ${ACR_REGISTRY} --username 00000000-0000-0000-0000-000000000000 --password $TOKEN'
+                sh 'docker login ${ACR_REGISTRY} --username 00000000-0000-0000-0000-000000000000 --password ${TOKEN}'
                 sh 'docker push "$ACR_REGISTRY/$ACR_REPO_NAME:postgr"'
                 sh 'docker push "$ACR_REGISTRY/$ACR_REPO_NAME:nodejs"'
                 sh 'docker push "$ACR_REGISTRY/$ACR_REPO_NAME:react"'
