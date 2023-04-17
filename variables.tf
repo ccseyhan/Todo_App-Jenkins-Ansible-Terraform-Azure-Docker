@@ -11,11 +11,11 @@ variable "admin_username" {
 }
 
 variable "ssh_key_rg" {
-  default = "ycetindil"
+  default = "sshkey"
 }
 
 variable "ssh_key_name" {
-  default = "ycetindil"
+  default = "azure"
 }
 
 variable "vm_tags" {
