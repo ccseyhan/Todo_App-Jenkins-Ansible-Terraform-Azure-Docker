@@ -6,8 +6,8 @@ pipeline {
 
     environment {
         PATH = sh(script:"echo $PATH:/usr/local/bin", returnStdout:true).trim()
-        ACR_REGISTRY = "todoappcoy.azurecr.io"
-        ACR_REPO_NAME = "todoappcoy"
+        ACR_REGISTRY = "todoappccs.azurecr.io"
+        ACR_REPO_NAME = "todoappccs"
         ACR_RESOURCE_GROUP = "todoapp-rg"
     }
 
