@@ -1,6 +1,6 @@
 plugin: azure_rm
 include_vm_resource_groups: ["*"]
-auth_source: msi
+auth_source: auto
 # keyed_groups:
 #   - key: tags.name
 #   - key: tags.environment
