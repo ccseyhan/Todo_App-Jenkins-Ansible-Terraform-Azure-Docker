@@ -55,7 +55,7 @@
 
     - name: Add ec2-user to docker group
       user:
-        name: ec2-user
+        name: clouduser
         groups: docker
         append: yes
 
